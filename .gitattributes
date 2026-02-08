@@ -1,0 +1,4 @@
+# Force LF line endings for scripts that run on Linux
+*.sh text eol=lf
+*.py text eol=lf
+DevOS_Project/system/init text eol=lf

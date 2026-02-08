@@ -68,6 +68,12 @@ cp -r /build/projects "$ROOTFS/"
 cp -r /build/system "$ROOTFS/"
 mkdir -p "$ROOTFS/logs" "$ROOTFS/tmp" "$ROOTFS/root"
 
+# 2b. Fix Windows CRLF line endings on all scripts
+echo "Fixing line endings..."
+find "$ROOTFS/ai" -type f -name "*.py" -exec sed -i 's/\r$//' {} +
+find "$ROOTFS/ai" -type f -name "*.txt" -exec sed -i 's/\r$//' {} +
+sed -i 's/\r$//' "$ROOTFS/system/init"
+
 # 3. Configure Setup
 echo "Configuring Init..."
 cp "$ROOTFS/system/init" "$ROOTFS/init"

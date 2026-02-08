@@ -1,0 +1,24 @@
+# Build artifacts
+DevOS_Project/output/
+DevOS_Project/work/
+DevOS_Project/logs/
+DevOS_Project/tmp/
+
+# ISO files
+*.iso
+
+# Docker
+.docker/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Claude
+.claude/

@@ -1,0 +1,54 @@
+#!/bin/sh
+
+# DevOS Init System (Fixed for /dev/tty issue)
+# This script runs as PID 1
+
+# 1. Mount essential filesystems
+/bin/mount -t proc proc /proc
+/bin/mount -t sysfs sysfs /sys
+/bin/mount -t devtmpfs devtmpfs /dev
+/bin/mkdir -p /dev/pts
+/bin/mount -t devpts devpts /dev/pts
+
+# 2. Populate /dev (mdev) - Critical for tty generation
+/sbin/mdev -s
+
+# 3. Setup environment
+export PATH=/usr/local/bin:/usr/bin:/bin:/sbin:/usr/sbin
+export HOME=/root
+export TERM=linux
+export LANG=C.UTF-8
+export PYTHONUNBUFFERED=1
+
+# 4. Create run dirs
+mkdir -p /run /tmp /var/log
+
+# 5. Start Logging
+dmesg > /var/log/dmesg.log
+
+# 6. Check for Graphical Mode (video= argument passed to kernel)
+VIDEO_MODE=$(grep -o "video=[^ ]*" /proc/cmdline)
+
+echo "=================================================="
+echo "   DEVOS KERNEL INITIALIZED   "
+echo "=================================================="
+
+if [ -n "$VIDEO_MODE" ]; then
+    echo "Starting GUI Mode..."
+    
+    # Ensure tty exists for X11
+    # X needs a tty to run on. Usually tty7 or tty1.
+    
+    # 6a. Switch to root user and start X11
+    # We use 'su' to start login shell as root which runs .xinitrc
+    exec su - root -c "startx"
+else
+    echo "Starting Headless Mode (AI Core)..."
+    
+    # 6b. Directly launch AI Core
+    exec /usr/bin/python3 -u /ai/core/main.py
+fi
+
+# Fallback shell if everything fails
+echo "CRITICAL: Init process finished unexpectedly."
+exec /bin/sh
